@@ -4,7 +4,7 @@
     "model": "XGBoost_native",
     "cv_rmsle": 0.12528436621247638,
     "holdout_rmsle": 0.12385753739680339,
-    "fit_time_s": 0.5552809238433838,
+    "fit_time_s": 1.5986053943634033,
     "params": {
       "n_estimators": 500,
       "learning_rate": 0.05,
@@ -18,7 +18,7 @@
     "model": "XGBoost_onehot",
     "cv_rmsle": 0.12648287811059455,
     "holdout_rmsle": 0.12534971752219828,
-    "fit_time_s": 0.9003088474273682,
+    "fit_time_s": 1.1401278972625732,
     "params": {
       "n_estimators": 500,
       "learning_rate": 0.05,
@@ -32,7 +32,7 @@
     "model": "XGBoost_tuned",
     "cv_rmsle": 0.11969725417671451,
     "holdout_rmsle": 0.11902033100134446,
-    "fit_time_s": 0.8818442821502686,
+    "fit_time_s": 2.1994426250457764,
     "params": {
       "n_estimators": 624,
       "learning_rate": 0.02756590050022456,
@@ -43,6 +43,6 @@
       "reg_alpha": 0.015893881613427033,
       "reg_lambda": 0.27634212513607853
     },
-    "notes": "Optuna 30 trials over 53s"
+    "notes": "Optuna 30 trials over 56s"
   }
 ]
