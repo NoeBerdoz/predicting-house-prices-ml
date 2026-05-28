@@ -7,11 +7,18 @@ Roleplay : société de conseil immobilier fictive **Inved Corp**. Modèle de r�
 
 ## Structure (CRISP-DM)
 
-| Notebook                          | Phases CRISP                                   |
-|-----------------------------------|------------------------------------------------|
-| `1_ideation_phase.ipynb`          | Phase 1 (Business) + Phase 2 (EDA)             |
-| `2_Design_phase.ipynb`            | Phase 3 (Prep) + Phase 4 (Modélisation) + Phase 5 (Évaluation) |
-| `3_Assessment_Blueprint.ipynb`    | Phase 6 — synthèse blueprint + soumission Kaggle |
+| Notebook                          | Phase(s) CRISP   | Rôle                                                        |
+|-----------------------------------|------------------|------------------------------------------------------------|
+| `1_ideation_phase.ipynb`          | Phase 1 + 2      | Business understanding + EDA                                |
+| `2_data_prep.ipynb`               | Phase 3          | Préparation canonique : 3 variantes de préprocesseur + helpers partagés |
+| `3a_scaled_models.ipynb`          | Phase 4          | Modèles sensibles à l'échelle (OLS, Ridge, Lasso, ElasticNet, KNN, MLP) |
+| `3b_sklearn_trees.ipynb`          | Phase 4          | Arbres sklearn (DecisionTree, RandomForest, GradientBoosting, AdaBoost) |
+| `3c_native_boosting.ipynb`        | Phase 4          | Boosting moderne (XGBoost natif vs OneHot, Optuna, SHAP)    |
+| `3d_stacking.ipynb`               | Phase 4          | Stacking à préparations mixtes (Lasso + GBR + XGB → RidgeCV) |
+| `4_evaluation.ipynb`              | Phase 5          | Comparaison inter-familles + dissertation + désignation du champion |
+| `5_Assessment_Blueprint.ipynb`    | Phase 6          | Synthèse blueprint (rapport direction) + soumission Kaggle  |
+
+> **Ordre d'exécution.** `2_data_prep.ipynb` est la source canonique de la préparation. Chaque notebook de modélisation / évaluation le ré-exécute automatiquement via `%run 2_data_prep.ipynb` en première cellule — il n'y a donc pas besoin de le lancer à la main au préalable, mais il doit rester exécutable. `4_evaluation.ipynb` lit les `results/family_*.json` produits par `3a`–`3d` ; `5_Assessment_Blueprint.ipynb` lit `results/winning_model.json` produit par `4_evaluation.ipynb`.
 
 Documentation détaillée du modèle dans `docs/MLCanvas_v1.2.pdf` (canvas OWNML rempli).
 
@@ -22,7 +29,8 @@ Python **3.13** requis (les versions pinnées dans `requirements.txt` le ciblent
 ```bash
 # 1. Créer le virtual env (depuis la racine du repo)
 python3.13 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate            # Linux / macOS
+# .venv\Scripts\activate             # Windows (PowerShell / cmd)
 
 # 2. Installer les dépendances
 pip install --upgrade pip
@@ -44,7 +52,7 @@ Dans Jupyter / PyCharm, sélectionner le kernel **"Python (Inved Corp .venv)"** 
 ## Lancer Jupyter
 
 ```bash
-source .venv/bin/activate
+source .venv/bin/activate            # Linux / macOS  (Windows : .venv\Scripts\activate)
 jupyter lab    # ou : jupyter notebook
 ```
 
@@ -54,4 +62,4 @@ Le dossier `data/` contient les CSV Kaggle d'origine (`train.csv`, `test.csv`, `
 
 ## Soumission Kaggle
 
-La soumission est générée par `3_Assessment_Blueprint.ipynb` (cellule du bas), qui produit un fichier `submission.csv` à la racine du repo. Ce fichier est git-ignoré — il faut l'uploader manuellement sur Kaggle.
+La soumission est générée par `5_Assessment_Blueprint.ipynb` (section 6.4), qui réentraîne le champion sur 100 % des données puis produit un fichier `submission.csv` à la racine du repo. Ce fichier est git-ignoré — il faut l'uploader manuellement sur Kaggle.
