@@ -4,7 +4,7 @@
     "model": "Stacking",
     "cv_rmsle": null,
     "holdout_rmsle": 0.11213950727058153,
-    "fit_time_s": 8.9763822555542,
+    "fit_time_s": 10.626371383666992,
     "params": {
       "meta": "RidgeCV",
       "base": [
