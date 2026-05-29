@@ -3,8 +3,8 @@
     "family": "stacking",
     "model": "Stacking",
     "cv_rmsle": null,
-    "holdout_rmsle": 0.11213950727058153,
-    "fit_time_s": 11.9354567527771,
+    "holdout_rmsle": 0.11220189637842252,
+    "fit_time_s": 13.01235556602478,
     "params": {
       "meta": "RidgeCV",
       "base": [
@@ -13,6 +13,6 @@
         "XGB"
       ]
     },
-    "notes": "Meta weights: Lasso=0.627, GBR=0.183, XGB=0.197"
+    "notes": "Meta weights: Lasso=0.569, GBR=0.078, XGB=0.365"
   }
 ]
