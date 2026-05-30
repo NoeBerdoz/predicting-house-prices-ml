@@ -1,8 +1,8 @@
 # Inved Corp — Estimation de prix immobiliers
 
-> **HES-SO ARC — Master en science des données (64-61.1)** · Équipe : Noé Berdoz, Cyrille Dos Ghali, Steeve Leuba.
+> **HES-SO ARC —  Science des données (64-61.1)** · Équipe : Noé Berdoz, Cyrille Dos Ghali, Steeve Leuba.
 
-Projet fil rouge mené sous la forme d'un **roleplay** : une société de conseil immobilier fictive, **Inved Corp**, veut un **outil assistif d'estimation** pour ses consultants. Le livrable suit la méthodologie **CRISP-ML(Q)** de bout en bout, du besoin métier jusqu'à une application de démonstration et au plan de surveillance en production.
+Projet mené sous la forme d'un **roleplay** : une société de conseil immobilier fictive, **Inved Corp**, veut un **outil assistif d'estimation** pour ses consultants. Le livrable suit la méthodologie **CRISP-ML(Q)** de bout en bout, du besoin métier jusqu'à une application de démonstration et au plan de surveillance en production.
 
 - **Tâche** : régression supervisée — prédire le **prix de vente** (`SalePrice`, USD) d'un bien résidentiel à partir de **79 caractéristiques**.
 - **Données** : Kaggle *« House Prices — Advanced Regression Techniques »* (Ames, Iowa), dans `data/`.
@@ -15,41 +15,40 @@ Projet fil rouge mené sous la forme d'un **roleplay** : une société de consei
 
 ## Méthodologie — CRISP-ML(Q)
 
-Le projet suit la méthodologie **CRISP-ML(Q)** (*Cross-Industry Standard Process for Machine Learning with Quality assurance*), conçue pour les projets de machine learning : elle structure le travail en phases — de la compréhension métier jusqu'à la **surveillance & maintenance** du modèle en production (§7) — avec des **exigences de qualité explicites à chaque phase**. Chaque phase est autonome et justifiée (le livrable est noté **1 point par phase**).
+Le projet suit la méthodologie **CRISP-ML(Q)** (*Cross-Industry Standard Process for Machine Learning with Quality assurance*), conçue pour les projets de machine learning : elle structure le travail en phases de la compréhension métier jusqu'à la **surveillance & maintenance** du modèle en production (§7), avec des **exigences de qualité explicites à chaque phase**.
 
-Convention de numérotation : **`§N = numéro de phase`**. Le préfixe de fichier (`1_`, `2_`, `3a`…) indique l'**ordre de lecture**, pas le numéro de chapitre — car la phase 4 (modélisation) s'étale sur 4 notebooks.
+Convention de numérotation : **`§N = numéro de phase`**. Le préfixe de fichier (`1_`, `2_`, `3a`…) indique l'**ordre de lecture**.
 
-| Phase | Intitulé | Où |
-|------:|----------|----|
-| 1 | Compréhension métier | `1_ideation_phase` (§1) |
-| 2 | Compréhension des données (EDA) | `1_ideation_phase` (§2) |
-| 3 | Préparation des données | `2_data_prep` (§3) |
-| 4 | Modélisation | `3a` / `3b` / `3c` / `3d` (§4.1–4.4) |
-| 5 | Évaluation | `4_evaluation` (§5) |
-| 6 | Déploiement | `5_deployment` (§6) |
-| 7 | Surveillance & maintenance *(extension Q)* | `6_monitoring` (§7) |
-| — | Conclusion (rapport à la direction) | `7_conclusion` |
-
+| Phase CRISP-ML | Intitulé | Où |
+|--------------:|----------|----|
+|             1 | Compréhension métier | `1_ideation_phase` (§1) |
+|             2 | Compréhension des données (EDA) | `1_ideation_phase` (§2) |
+|             3 | Préparation des données | `2_data_prep` (§3) |
+|             4 | Modélisation | `3a` / `3b` / `3c` / `3d` (§4.1–4.4) |
+|             5 | Évaluation | `4_evaluation` (§5) |
+|             6 | Déploiement | `5_deployment` (§6) |
+|             7 | Surveillance & maintenance *(extension Q)* | `6_monitoring` (§7) |
+|             — | Conclusion | `7_conclusion` |
 ---
 
 ## Structure du projet (10 notebooks)
 
-| Notebook | Phase | Rôle |
-|----------|-------|------|
-| `1_ideation_phase.ipynb` | §1 + §2 | Business understanding (ML Canvas) + EDA commentée (Shapiro-Wilk, ANOVA, cardinalité, justification RMSLE) |
-| `2_data_prep.ipynb` | §3 | Préparation **canonique** : feature engineering, anti-fuite (imputation dans le Pipeline), encodage hybride (Ordinal / TargetEncoder / OHE), **3 préprocesseurs** (`_scaled` / `_encoded` / `_native`) + helpers partagés |
-| `3a_scaled_models.ipynb` | §4.1 | Linéaires + KNN + MLP (OLS, Ridge, Lasso, ElasticNet, SVR, KNN, MLP) — chemins de régularisation, diagnostics OLS |
-| `3b_sklearn_trees.ipynb` | §4.2 | Arbres sklearn (DecisionTree, RandomForest, GradientBoosting, AdaBoost) |
-| `3c_native_boosting.ipynb` | §4.3 | Boosting moderne (XGBoost natif vs OneHot + Optuna, LightGBM, CatBoost) + **SHAP** |
-| `3d_stacking.ipynb` | §4.4 | **Stacking** à préparations mixtes (Lasso + GradientBoosting + XGBoost → méta-RidgeCV) |
-| `4_evaluation.ipynb` | §5 | Comparaison inter-familles, dissertation 3 axes (math/système/métier), IC bootstrap, équité OOF → désignation du **champion** |
-| `5_deployment.ipynb` | §6 | Réentraînement sur 100 % des données, **soumission Kaggle**, **registre + service MLflow**, stratégie de déploiement, coût, scaffold PoC |
-| `6_monitoring.ipynb` | §7 | Monitoring **3 couches** + traçabilité MLflow des 17 modèles + dérive PSI + réentraînement + équité continue |
-| `7_conclusion.ipynb` | — | Synthèse exécutive (rapport à la direction) : récap CRISP-ML(Q), champion, risques, perspectives |
+| Notebook | Chapitre | Rôle |
+|----------|----------|------|
+| `1_ideation_phase.ipynb` | §1 + §2  | Business understanding (ML Canvas) + EDA commentée (Shapiro-Wilk, ANOVA, cardinalité, justification RMSLE) |
+| `2_data_prep.ipynb` | §3       | Préparation **canonique** : feature engineering, anti-fuite (imputation dans le Pipeline), encodage hybride (Ordinal / TargetEncoder / OHE), **3 préprocesseurs** (`_scaled` / `_encoded` / `_native`) + helpers partagés |
+| `3a_scaled_models.ipynb` | §4.1     | Linéaires + KNN + MLP (OLS, Ridge, Lasso, ElasticNet, SVR, KNN, MLP) — chemins de régularisation, diagnostics OLS |
+| `3b_sklearn_trees.ipynb` | §4.2     | Arbres sklearn (DecisionTree, RandomForest, GradientBoosting, AdaBoost) |
+| `3c_native_boosting.ipynb` | §4.3     | Boosting moderne (XGBoost natif vs OneHot + Optuna, LightGBM, CatBoost) + **SHAP** |
+| `3d_stacking.ipynb` | §4.4     | **Stacking** à préparations mixtes (Lasso + GradientBoosting + XGBoost → méta-RidgeCV) |
+| `4_evaluation.ipynb` | §5       | Comparaison inter-familles, dissertation 3 axes (math/système/métier), IC bootstrap, équité OOF → désignation du **champion** |
+| `5_deployment.ipynb` | §6       | Réentraînement sur 100 % des données, **soumission Kaggle**, **registre + service MLflow**, stratégie de déploiement, coût, scaffold PoC |
+| `6_monitoring.ipynb` | §7       | Monitoring **3 couches** + traçabilité MLflow des 17 modèles + dérive PSI + réentraînement + équité continue |
+| `7_conclusion.ipynb` | —        | Synthèse exécutive (rapport à la direction) : récap CRISP-ML(Q), champion, risques, perspectives |
 
 > **Ordre d'exécution.** `2_data_prep.ipynb` est la **source unique** de la préparation : chaque notebook de modélisation/évaluation/monitoring le ré-exécute via `%run 2_data_prep.ipynb` en première cellule (rien à lancer à la main, mais il doit rester exécutable). `4_evaluation` lit les `results/family_*.json` produits par `3a`–`3d` ; `5_deployment` lit `results/winning_model.json` produit par `4_evaluation`.
 >
-> *Archives (à ne pas toucher) : `old_2_Design_phase.ipynb`, `old_3_Assessment_Blueprint.ipynb` (originaux pré-découpage) et `predicting-houses-prices-ml.ipynb` (mono-notebook historique).*
+> *Archives (TODO: à supprimmer) : `old_2_Design_phase.ipynb`, `old_3_Assessment_Blueprint.ipynb` (originaux pré-découpage) et `predicting-houses-prices-ml.ipynb` (mono-notebook historique).*
 
 ---
 
@@ -116,7 +115,7 @@ Le modèle est chargé via MLflow ; deux chemins d'inférence (détection automa
 
 ## Installation de l'environnement
 
-Python **3.13** requis (versions pinnées dans `requirements.txt`). **Note** : `pandas==2.3.3` (et non 3.x) car MLflow exige `pandas<3` ; combinaison vérifiée sans changement de résultats.
+Python **3.13** requis (versions pinnées dans `requirements.txt`).
 
 ```bash
 # 1. Virtual env (depuis la racine du repo)
