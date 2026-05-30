@@ -362,6 +362,14 @@ def page_chrome(active, title):
         ui.element("div").style(f"width:60px;height:3px;background:linear-gradient(90deg,{GOLD},transparent);border-radius:3px")
 
 
+def info_badge(text, inline=False):
+    """Gold (i) icon with a hover/tap tooltip. Absolute top-right of a position:relative card,
+    or inline next to a title when inline=True."""
+    pos = "" if inline else "position:absolute;top:10px;right:12px;"
+    ic = ui.icon("info", size="16px").classes("infohelp").style(f"{pos}color:{GOLD};opacity:.7;cursor:help;z-index:5")
+    ic.tooltip(text)
+
+
 @ui.page("/")
 def estimation_page():
     page_chrome("Estimation", "Estimation immobilière")
@@ -404,11 +412,21 @@ def estimation_page():
 
     # charts row
     with ui.grid(columns=2).classes("w-full gap-5").style("margin-top:20px"):
-        c_market = ui.echart(market_chart_opt(150000)).classes("glass").style("height:300px;padding:8px")
-        c_radar = ui.echart(radar_chart_opt({"OverallQual": 6, "OverallCond": 5, "GrLivArea": 1464, "YearBuilt": 1973, "GarageCars": 2})).classes("glass").style("height:300px;padding:8px")
-    with ui.element("div").classes("glass w-full").style("margin-top:20px;padding:8px"):
+        with ui.element("div").classes("glass").style("position:relative;padding:8px"):
+            info_badge("Où se situe cette estimation dans la distribution des prix de vente d'Ames "
+                       "(barre dorée = ce bien). Le titre indique le percentile de marché — ex. « Top 60 % ».")
+            c_market = ui.echart(market_chart_opt(150000)).style("height:300px;width:100%")
+        with ui.element("div").classes("glass").style("position:relative;padding:8px"):
+            info_badge("Profil du bien (qualité, état, surface, récence, garage) en percentiles 0–100, "
+                       "comparé au marché médian. Plus l'aire dorée dépasse le pointillé, plus le bien est au-dessus du marché.")
+            c_radar = ui.echart(radar_chart_opt({"OverallQual": 6, "OverallCond": 5, "GrLivArea": 1464, "YearBuilt": 1973, "GarageCars": 2})).style("height:300px;width:100%")
+    with ui.element("div").classes("glass w-full").style("position:relative;margin-top:20px;padding:8px"):
+        info_badge("Facteurs SHAP : combien chaque caractéristique pousse CETTE estimation à la hausse (doré, +) "
+                   "ou à la baisse (gris, −), en % d'effet sur le prix. Approximé via le membre XGBoost du modèle Stacking.")
         c_shap = ui.echart(shap_chart_opt([])).style("height:300px;width:100%")
-    with ui.element("div").classes("glass w-full").style("margin-top:20px;padding:8px"):
+    with ui.element("div").classes("glass w-full").style("position:relative;margin-top:20px;padding:8px"):
+        info_badge("Prix médian de vente par quartier (le vôtre en doré) ; la ligne blanche = votre estimation IA. "
+                   "Situe le bien parmi des comparables géographiques.")
         c_comps = ui.echart(comps_chart_opt("NAmes", 150000)).style("height:320px;width:100%")
 
     def update():
@@ -466,11 +484,17 @@ def monitoring_page():
     with ui.row().classes("w-full gap-5 items-stretch no-wrap"):
         with ui.element("div").classes("glass").style("flex:2;padding:18px"):
             with ui.row().classes("items-center justify-between w-full"):
-                ui.label("Dérive des données (PSI) — train vs test Kaggle").style(f"color:{INK};font-weight:600")
+                with ui.row().classes("items-center gap-2"):
+                    ui.label("Dérive des données (PSI) — train vs test Kaggle").style(f"color:{INK};font-weight:600")
+                    info_badge("PSI (Population Stability Index) : décalage de distribution d'une variable entre "
+                               "l'entraînement et les données entrantes. <0,1 stable · 0,1–0,25 à surveiller · "
+                               ">0,25 dérive forte → réentraînement (lignes pointillées = seuils).", inline=True)
                 sw = ui.switch("Simuler une gentrification").props("color=amber")
             psi_chart = ui.echart(psi_chart_opt(compute_psi(TEST_FEAT))).style("height:250px;width:100%")
             psi_status = ui.label("").style(f"color:{MUTE};font-size:.82rem;margin-top:4px")
-        with ui.element("div").classes("glass").style("flex:1;padding:18px;text-align:center"):
+        with ui.element("div").classes("glass").style("position:relative;flex:1;padding:18px;text-align:center"):
+            info_badge("RMSLE = erreur du modèle en échelle logarithmique (≈ erreur relative). Sous le seuil 0,13 "
+                       "→ modèle livrable ; au-dessus → investigation + réentraînement.")
             ui.label("RMSLE réalisé").style(f"color:{INK};font-weight:600")
             ui.echart(rmsle_gauge_opt()).style("height:190px;width:100%")
             ui.label("seuil de réentraînement : 0,13").style(f"color:{MUTE};font-size:.76rem")
@@ -498,11 +522,15 @@ def monitoring_page():
         _t0 = _t.perf_counter(); CLIENT.predict(_row); _lat.append((_t.perf_counter() - _t0) * 1000)
     p50, p95 = float(np.percentile(_lat, 50)), float(np.percentile(_lat, 95))
     with ui.row().classes("w-full gap-5 items-stretch no-wrap"):
-        with ui.element("div").classes("glass").style("flex:1;padding:20px"):
+        with ui.element("div").classes("glass").style("position:relative;flex:1;padding:20px"):
+            info_badge("Temps de réponse du modèle par estimation. SLA du ML Canvas : < 5 s. Mesuré ici en mémoire "
+                       "(proxy) ; en production l'API mesurerait la latence HTTP réelle (p50/p95/p99).")
             ui.label("Latence d'inférence").style(f"color:{INK};font-weight:600")
             ui.label(f"p50 {p50:.0f} ms · p95 {p95:.0f} ms").style(f"color:{GOLD};font-size:1.5rem;font-weight:700;margin:6px 0")
             ui.label("SLA Canvas < 5 000 ms — marge ~90× (proxy in-process)").style(f"color:{MUTE};font-size:.76rem")
-        with ui.element("div").classes("glass").style("flex:2;padding:20px"):
+        with ui.element("div").classes("glass").style("position:relative;flex:2;padding:20px"):
+            info_badge("Versions du modèle dans le MLflow Model Registry. L'alias @Production = la version "
+                       "actuellement servie ; un rollback consiste à repointer l'alias sur une version précédente.")
             ui.label("Versions déployées — MLflow Registry").style(f"color:{INK};font-weight:600;margin-bottom:6px")
             rows = deployment_rows()
             if rows:
@@ -524,7 +552,10 @@ def monitoring_page():
                 ui.label(big).classes("serif").style(f"color:{GOLD};font-size:1.7rem;font-weight:700")
                 ui.label(sub).style(f"color:{MUTE};font-size:.74rem")
                 ui.label("valeur illustrative — mesurée après déploiement").style("color:#5a626c;font-size:.66rem;margin-top:6px")
-    with ui.element("div").classes("glass w-full").style("margin-top:16px;padding:8px"):
+    with ui.element("div").classes("glass w-full").style("position:relative;margin-top:16px;padding:8px"):
+        info_badge("Distribution des erreurs d'estimation (%) par quartier, sur le holdout. Une boîte centrée sur "
+                   "0 % = pas de biais ; un quartier décalé (bordé de rouge) = sur/sous-estimation à surveiller "
+                   "(équité anti-redlining).")
         ui.echart(equity_box_opt()).style("height:340px;width:100%")
     ui.label("Audit d'équité (anti-redlining) : médianes de résidus par quartier surveillées en continu ; léger "
              "penchant à sous-estimer BrkSide / IDOTRR à suivre (cf. NB4 §5.5.4). Rollout A/B 50/50 sur 3 mois avant généralisation.").style(
