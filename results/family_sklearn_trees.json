@@ -4,7 +4,7 @@
     "model": "DecisionTree",
     "cv_rmsle": 0.18702135831297056,
     "holdout_rmsle": 0.17975929906654903,
-    "fit_time_s": 0.057631492614746094,
+    "fit_time_s": 0.05873370170593262,
     "params": {
       "max_depth": 5
     },
@@ -13,9 +13,9 @@
   {
     "family": "sklearn_trees",
     "model": "RandomForest",
-    "cv_rmsle": 0.1368492959168576,
-    "holdout_rmsle": 0.1377876580956111,
-    "fit_time_s": 1.3548939228057861,
+    "cv_rmsle": 0.13684929591685763,
+    "holdout_rmsle": 0.13778765809561086,
+    "fit_time_s": 1.6862318515777588,
     "params": {
       "n_estimators": 300
     },
@@ -26,7 +26,7 @@
     "model": "GradientBoosting",
     "cv_rmsle": 0.1251681466106106,
     "holdout_rmsle": 0.11541874747860104,
-    "fit_time_s": 1.8810091018676758,
+    "fit_time_s": 2.7579081058502197,
     "params": {
       "n_estimators": 300,
       "learning_rate": 0.05,
@@ -39,7 +39,7 @@
     "model": "AdaBoost",
     "cv_rmsle": 0.1591864326019285,
     "holdout_rmsle": 0.16974482543808156,
-    "fit_time_s": 1.051300048828125,
+    "fit_time_s": 1.6503674983978271,
     "params": {
       "n_estimators": 200
     },
