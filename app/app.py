@@ -14,7 +14,7 @@ from nicegui import ui
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from api_client import get_client                 # noqa: E402
-from features import build_row, load_defaults     # noqa: E402
+from features import build_row, engineer_features, load_defaults  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,6 +34,113 @@ MARKET = {
     "YearBuilt": float(_train["YearBuilt"].median()),
     "GarageCars": float(_train["GarageCars"].median()),
 }
+
+# ---- monitoring data + helpers ----
+import json as _json  # noqa: E402
+
+_eq_path = Path(__file__).resolve().parent / "monitoring_data.json"
+EQUITY = _json.loads(_eq_path.read_text())["equity"] if _eq_path.exists() else {}
+TRAIN_FEAT = engineer_features(_train.copy())
+TEST_FEAT = engineer_features(pd.read_csv(ROOT / "data" / "test.csv"))
+PSI_FEATS = ["GrLivArea", "TotalSF", "OverallQual", "1stFlrSF", "LotArea",
+             "HouseAge", "GarageCars", "TotalBathrooms", "YearBuilt"]
+
+
+def psi(expected, actual, bins=10):
+    cuts = np.unique(np.quantile(expected.dropna(), np.linspace(0, 1, bins + 1)))
+    if len(cuts) < 3:
+        return float("nan")
+    e = np.histogram(expected.dropna(), bins=cuts)[0] / max(expected.notna().sum(), 1)
+    a = np.histogram(actual.dropna(), bins=cuts)[0] / max(actual.notna().sum(), 1)
+    e, a = np.clip(e, 1e-4, None), np.clip(a, 1e-4, None)
+    return float(np.sum((a - e) * np.log(a / e)))
+
+
+def compute_psi(test_df):
+    return {f: psi(TRAIN_FEAT[f], test_df[f]) for f in PSI_FEATS if f in TRAIN_FEAT and f in test_df}
+
+
+def gentrified_test():
+    g = TEST_FEAT.copy()
+    m = g["Neighborhood"] == "NAmes"  # one quartier gentrifies
+    g.loc[m, "OverallQual"] = (g.loc[m, "OverallQual"] + 3).clip(upper=10)
+    g.loc[m, "TotalSF"] = g.loc[m, "TotalSF"] * 1.30
+    g.loc[m, "YearsSinceRemodel"] = (g.loc[m, "YearsSinceRemodel"] - 25).clip(lower=0)
+    g.loc[m, "HouseAge"] = (g.loc[m, "HouseAge"] - 20).clip(lower=0)
+    return g
+
+
+def psi_band(v):
+    if v > 0.25:
+        return "dérive forte", "#d39090"
+    if v > 0.1:
+        return "à surveiller", GOLD_SOFT
+    return "stable", "#6fd38d"
+
+
+def psi_chart_opt(psi_dict):
+    feats = list(psi_dict.keys())
+    bars = [{"value": round(psi_dict[f], 3), "itemStyle": {"color": psi_band(psi_dict[f])[1]}} for f in feats]
+    o = echart_base()
+    o.update({
+        "grid": {"left": 48, "right": 18, "top": 24, "bottom": 66},
+        "xAxis": {"type": "category", "data": feats, "axisLabel": {"rotate": 40, "color": AXIS, "fontSize": 10},
+                  "axisLine": {"lineStyle": {"color": "rgba(255,255,255,.15)"}}},
+        "yAxis": {"type": "value", "axisLabel": {"color": AXIS},
+                  "splitLine": {"lineStyle": {"color": "rgba(255,255,255,.06)"}}},
+        "series": [{"type": "bar", "data": bars, "barWidth": "55%",
+                    "markLine": {"silent": True, "symbol": "none", "data": [
+                        {"yAxis": 0.1, "lineStyle": {"color": GOLD_SOFT, "type": "dashed"}, "label": {"formatter": "0,1", "color": AXIS}},
+                        {"yAxis": 0.25, "lineStyle": {"color": "#d39090", "type": "dashed"}, "label": {"formatter": "0,25", "color": AXIS}}]}}],
+    })
+    return o
+
+
+def rmsle_gauge_opt():
+    return {"backgroundColor": "transparent", "series": [{
+        "type": "gauge", "min": 0.08, "max": 0.18, "radius": "95%", "center": ["50%", "58%"],
+        "axisLine": {"lineStyle": {"width": 14, "color": [[0.5, GOLD], [1, "rgba(211,144,144,.65)"]]}},
+        "pointer": {"itemStyle": {"color": GOLD_SOFT}}, "progress": {"show": False},
+        "axisLabel": {"color": AXIS, "fontSize": 9, "distance": -40}, "axisTick": {"show": False},
+        "splitLine": {"length": 10, "lineStyle": {"color": "rgba(255,255,255,.25)"}}, "title": {"show": False},
+        "detail": {"formatter": "{value}", "color": INK, "fontSize": 22, "offsetCenter": [0, "64%"]},
+        "data": [{"value": 0.1122}]}]}
+
+
+def deployment_rows():
+    try:
+        import mlflow as _m
+        from mlflow.tracking import MlflowClient
+        _m.set_tracking_uri(f"file:{ROOT / 'mlruns'}")
+        c = MlflowClient()
+        out = []
+        for mv in c.search_model_versions("name='inved-house-price'"):
+            out.append({"version": str(mv.version), "alias": ",".join(getattr(mv, "aliases", []) or []) or "—",
+                        "run_id": (mv.run_id or "")[:8], "statut": mv.status or "—"})
+        return sorted(out, key=lambda r: int(r["version"]))
+    except Exception:
+        return []
+
+
+def equity_box_opt():
+    names = list(EQUITY.keys())
+    boxdata = []
+    for n in names:
+        med = EQUITY[n]["median"]
+        col = "#d39090" if abs(med) > 8 else GOLD
+        boxdata.append({"value": EQUITY[n]["box"], "itemStyle": {"color": "rgba(212,175,55,.16)", "borderColor": col}})
+    o = echart_base()
+    o.update({
+        "title": {"text": "Équité — résidus par quartier (%, holdout)", "left": "center",
+                  "textStyle": {"color": INK, "fontSize": 13, "fontWeight": 600}},
+        "grid": {"left": 52, "right": 20, "top": 40, "bottom": 80},
+        "xAxis": {"type": "category", "data": names, "axisLabel": {"rotate": 45, "color": AXIS, "fontSize": 9},
+                  "axisLine": {"lineStyle": {"color": "rgba(255,255,255,.15)"}}},
+        "yAxis": {"type": "value", "axisLabel": {"color": AXIS, "formatter": "{value}%"},
+                  "splitLine": {"lineStyle": {"color": "rgba(255,255,255,.06)"}}},
+        "series": [{"type": "boxplot", "data": boxdata}],
+    })
+    return o
 
 # ---- palette ----
 BG = "#0d0f13"
@@ -159,6 +266,66 @@ def radar_chart_opt(form):
     return o
 
 
+FEATURE_FR = {
+    "TotalSF": "Surface totale", "OverallQual": "Qualité globale", "Neighborhood": "Quartier",
+    "GarageCars": "Garage (places)", "TotalBathrooms": "Salles de bain", "GrLivArea": "Surface habitable",
+    "KitchenQual": "Qualité cuisine", "YearBuilt": "Année de construction", "1stFlrSF": "Surface 1er niveau",
+    "LotArea": "Terrain", "OverallCond": "État général", "BsmtUnfSF": "Sous-sol non fini",
+    "FullBath": "Salles de bain", "HouseAge": "Âge du bien", "YearsSinceRemodel": "Réno. (années)",
+    "GarageAge": "Âge du garage", "2ndFlrSF": "Surface étage", "ExterQual": "Qualité extérieure",
+    "BsmtFinSF1": "Sous-sol fini", "MSZoning": "Zonage", "Fireplaces": "Cheminées", "CentralAir": "Climatisation",
+}
+
+
+def _xgb_parts():
+    """XGBoost base of the Stacking champion (preprocessor, model) for SHAP — loaded once."""
+    obj = getattr(CLIENT, "model", None)
+    if obj is None:
+        import mlflow as _m
+        _m.set_tracking_uri(f"file:{ROOT / 'mlruns'}")
+        obj = _m.sklearn.load_model("models:/inved-house-price@Production")
+    try:
+        p = obj.named_estimators_["xgb"]
+        return p[:-1], p[-1]
+    except Exception:
+        return None, None
+
+
+SHAP_PREP, SHAP_MODEL = _xgb_parts()
+
+
+def shap_top_factors(row, k=6):
+    """Per-estimate factors via XGBoost-native SHAP (pred_contribs). Returns [(label, %effect)]."""
+    if SHAP_MODEL is None:
+        return []
+    import xgboost
+    Xt = SHAP_PREP.transform(row)
+    cols = list(Xt.columns) if hasattr(Xt, "columns") else list(SHAP_PREP.get_feature_names_out())
+    contribs = SHAP_MODEL.get_booster().predict(
+        xgboost.DMatrix(Xt, enable_categorical=True), pred_contribs=True)[0][:-1]
+    pairs = sorted(zip(cols, contribs), key=lambda kv: abs(kv[1]), reverse=True)[:k]
+    return [(FEATURE_FR.get(c, c), float((np.exp(v) - 1) * 100)) for c, v in pairs]
+
+
+def shap_chart_opt(factors):
+    factors = list(reversed(factors))  # ECharts horizontal bars render bottom-up
+    bars = [{"value": round(f[1], 1),
+             "itemStyle": {"color": GOLD if f[1] >= 0 else "rgba(232,234,237,.30)"}} for f in factors]
+    o = echart_base()
+    o.update({
+        "grid": {"left": 150, "right": 60, "top": 36, "bottom": 28},
+        "title": {"text": "Facteurs de l'estimation (IA)", "left": "center",
+                  "textStyle": {"color": INK, "fontSize": 13, "fontWeight": 600}},
+        "xAxis": {"type": "value", "axisLabel": {"color": AXIS, "formatter": "{value}%"},
+                  "splitLine": {"lineStyle": {"color": "rgba(255,255,255,.06)"}}},
+        "yAxis": {"type": "category", "data": [f[0] for f in factors], "axisLabel": {"color": AXIS},
+                  "axisLine": {"lineStyle": {"color": "rgba(255,255,255,.15)"}}},
+        "series": [{"type": "bar", "data": bars, "barWidth": "62%",
+                    "label": {"show": True, "position": "right", "formatter": "{c}%", "color": AXIS, "fontSize": 10}}],
+    })
+    return o
+
+
 def nav_item(label, icon, path, active):
     cls = "navitem navactive" if active else "navitem"
     row = ui.row().classes(f"{cls} items-center gap-3 w-full cursor-pointer").style("padding:13px 20px")
@@ -232,14 +399,15 @@ def estimation_page():
             band_lbl = ui.label("").style(f"color:{MUTE};font-size:.82rem")
             ui.element("div").style(f"height:1px;background:{LINE};margin:18px 0")
             ui.label("PRINCIPAUX FACTEURS").style(f"color:{GOLD};font-size:.72rem;letter-spacing:1px")
-            with ui.column().classes("gap-1 items-center").style("margin-top:6px"):
-                ui.label("Analyse SHAP — prochaine étape").style(f"color:{MUTE};font-size:.78rem")
+            factors_box = ui.column().classes("gap-1 w-full items-start").style("margin-top:6px")
             meta_lbl = ui.label("").style(f"color:#5a626c;font-size:.68rem;margin-top:14px")
 
     # charts row
     with ui.grid(columns=2).classes("w-full gap-5").style("margin-top:20px"):
         c_market = ui.echart(market_chart_opt(150000)).classes("glass").style("height:300px;padding:8px")
         c_radar = ui.echart(radar_chart_opt({"OverallQual": 6, "OverallCond": 5, "GrLivArea": 1464, "YearBuilt": 1973, "GarageCars": 2})).classes("glass").style("height:300px;padding:8px")
+    with ui.element("div").classes("glass w-full").style("margin-top:20px;padding:8px"):
+        c_shap = ui.echart(shap_chart_opt([])).style("height:300px;width:100%")
     with ui.element("div").classes("glass w-full").style("margin-top:20px;padding:8px"):
         c_comps = ui.echart(comps_chart_opt("NAmes", 150000)).style("height:320px;width:100%")
 
@@ -259,12 +427,23 @@ def estimation_page():
             )
             band_lbl.set_text(f"Fourchette indicative : ${lo:,.0f} — ${hi:,.0f}")
             meta_lbl.set_text(f"{CLIENT.mode} · {latency*1000:.0f} ms · fourchette non calibrée")
+            facts = shap_top_factors(row, k=6)
             for ch, opt in ((c_market, market_chart_opt(price)),
                             (c_comps, comps_chart_opt(neigh.value, price)),
-                            (c_radar, radar_chart_opt(form))):
+                            (c_radar, radar_chart_opt(form)),
+                            (c_shap, shap_chart_opt(facts))):
                 ch.options.clear()
                 ch.options.update(opt)
                 ch.update()
+            factors_box.clear()
+            with factors_box:
+                if facts:
+                    for name, pct in facts[:3]:
+                        col = GOLD if pct >= 0 else "#d39090"
+                        ui.label(f"{'▲' if pct >= 0 else '▼'} {name}   {pct:+.0f}%").style(
+                            f"color:{col};font-size:.84rem;font-weight:500")
+                else:
+                    ui.label("facteurs indisponibles").style(f"color:{MUTE};font-size:.78rem")
         except Exception as exc:
             ui.notify(f"Estimation impossible : {exc}", type="negative")
 
@@ -276,9 +455,80 @@ def estimation_page():
 @ui.page("/monitoring")
 def monitoring_page():
     page_chrome("Monitoring", "Supervision du modèle")
-    ui.label("Tableau de bord — équipe data science / ops (≠ consultant).").style(f"color:{MUTE}")
-    with ui.element("div").classes("glass").style("padding:24px;margin-top:12px"):
-        ui.label("Monitoring sur trois couches (mathématique / système / métier) — à venir.").style(f"color:{MUTE}")
+    with ui.row().classes("items-center justify-between w-full").style("margin-bottom:4px"):
+        ui.label("Vue équipe data science / ops — les 3 axes d'évaluation de la Phase 5, en continu.").style(f"color:{MUTE}")
+        ui.link("Ouvrir MLflow UI ↗", "http://127.0.0.1:5001", new_tab=True).style(
+            f"color:{GOLD};text-decoration:none;font-weight:600")
+
+    # ===== Couche 1 — mathématique =====
+    ui.label("Couche 1 — Mathématique").classes("serif").style(f"color:{GOLD};font-size:1.2rem;margin-top:12px")
+    state = {"g": False}
+    with ui.row().classes("w-full gap-5 items-stretch no-wrap"):
+        with ui.element("div").classes("glass").style("flex:2;padding:18px"):
+            with ui.row().classes("items-center justify-between w-full"):
+                ui.label("Dérive des données (PSI) — train vs test Kaggle").style(f"color:{INK};font-weight:600")
+                sw = ui.switch("Simuler une gentrification").props("color=amber")
+            psi_chart = ui.echart(psi_chart_opt(compute_psi(TEST_FEAT))).style("height:250px;width:100%")
+            psi_status = ui.label("").style(f"color:{MUTE};font-size:.82rem;margin-top:4px")
+        with ui.element("div").classes("glass").style("flex:1;padding:18px;text-align:center"):
+            ui.label("RMSLE réalisé").style(f"color:{INK};font-weight:600")
+            ui.echart(rmsle_gauge_opt()).style("height:190px;width:100%")
+            ui.label("seuil de réentraînement : 0,13").style(f"color:{MUTE};font-size:.76rem")
+
+    def refresh_psi():
+        ps = compute_psi(gentrified_test() if state["g"] else TEST_FEAT)
+        psi_chart.options.clear(); psi_chart.options.update(psi_chart_opt(ps)); psi_chart.update()
+        mx = max(ps.values()); band, _ = psi_band(mx)
+        psi_status.set_text(f"PSI max = {mx:.3f} → {band}" + ("   ·   réentraînement déclenché" if mx > 0.25 else ""))
+
+    sw.on_value_change(lambda e: (state.update(g=e.value), refresh_psi()))
+    refresh_psi()
+
+    with ui.row().classes("w-full gap-4").style("margin-top:8px"):
+        for txt in ["Cadence mensuelle (fenêtre glissante)", "RMSLE ≤ 0,13", "PSI < 0,25"]:
+            with ui.element("div").classes("glass").style("flex:1;padding:12px"):
+                ui.label("● " + txt).style("color:#6fd38d;font-size:.82rem")
+
+    # ===== Couche 2 — système =====
+    ui.label("Couche 2 — Système").classes("serif").style(f"color:{GOLD};font-size:1.2rem;margin-top:22px")
+    import time as _t
+    _row = build_row({}, DEFAULTS)
+    _lat = []
+    for _ in range(15):
+        _t0 = _t.perf_counter(); CLIENT.predict(_row); _lat.append((_t.perf_counter() - _t0) * 1000)
+    p50, p95 = float(np.percentile(_lat, 50)), float(np.percentile(_lat, 95))
+    with ui.row().classes("w-full gap-5 items-stretch no-wrap"):
+        with ui.element("div").classes("glass").style("flex:1;padding:20px"):
+            ui.label("Latence d'inférence").style(f"color:{INK};font-weight:600")
+            ui.label(f"p50 {p50:.0f} ms · p95 {p95:.0f} ms").style(f"color:{GOLD};font-size:1.5rem;font-weight:700;margin:6px 0")
+            ui.label("SLA Canvas < 5 000 ms — marge ~90× (proxy in-process)").style(f"color:{MUTE};font-size:.76rem")
+        with ui.element("div").classes("glass").style("flex:2;padding:20px"):
+            ui.label("Versions déployées — MLflow Registry").style(f"color:{INK};font-weight:600;margin-bottom:6px")
+            rows = deployment_rows()
+            if rows:
+                ui.table(columns=[{"name": k, "label": k.capitalize(), "field": k} for k in rows[0]],
+                         rows=rows).props("dense flat").style("background:transparent;color:#e8eaed")
+            else:
+                ui.label("registre indisponible — lancer `mlflow ui`").style(f"color:{MUTE};font-size:.8rem")
+    ui.label("Aussi surveillés : taux d'erreur 5xx (seuil 1 %), volume de requêtes, logs de prédiction "
+             "(rétention 90 j pour l'audit d'équité), événements de déploiement.").style(f"color:{MUTE};font-size:.76rem;margin-top:6px")
+
+    # ===== Couche 3 — métier =====
+    ui.label("Couche 3 — Métier").classes("serif").style(f"color:{GOLD};font-size:1.2rem;margin-top:22px")
+    with ui.row().classes("w-full gap-4"):
+        for big, sub, lab in [("4 h → 2 h", "−50 % temps d'expertise", "Temps d'expertise"),
+                              ("+20 %", "ventes sous 90 jours", "Conversion 90 j"),
+                              ("< 10 %", "décisions corrigées", "Taux d'override")]:
+            with ui.element("div").classes("glass").style("flex:1;padding:18px"):
+                ui.label(lab).style(f"color:{MUTE};font-size:.74rem;letter-spacing:1px")
+                ui.label(big).classes("serif").style(f"color:{GOLD};font-size:1.7rem;font-weight:700")
+                ui.label(sub).style(f"color:{MUTE};font-size:.74rem")
+                ui.label("valeur illustrative — mesurée après déploiement").style("color:#5a626c;font-size:.66rem;margin-top:6px")
+    with ui.element("div").classes("glass w-full").style("margin-top:16px;padding:8px"):
+        ui.echart(equity_box_opt()).style("height:340px;width:100%")
+    ui.label("Audit d'équité (anti-redlining) : médianes de résidus par quartier surveillées en continu ; léger "
+             "penchant à sous-estimer BrkSide / IDOTRR à suivre (cf. NB4 §5.5.4). Rollout A/B 50/50 sur 3 mois avant généralisation.").style(
+        f"color:{MUTE};font-size:.78rem;margin-top:8px")
 
 
 ui.run(host="127.0.0.1", port=8502, reload=False, show=False, title="Inved Corp AI",
