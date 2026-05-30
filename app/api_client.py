@@ -1,8 +1,8 @@
 """Inference clients for the Inved PoC.
 
 Two paths (decision 2026-05-30): try the MLflow-served REST API first, fall back to
-loading the registered champion in-process. Pure Python — Streamlit caching is wired
-in app.py, so this module stays importable/testable without a running Streamlit server.
+loading the registered champion in-process. Pure Python — UI caching is wired
+in app.py, so this module stays importable/testable without a running UI server.
 """
 from __future__ import annotations
 

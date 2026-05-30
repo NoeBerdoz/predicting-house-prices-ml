@@ -1,7 +1,7 @@
 """Feature engineering for the Inved PoC.
 
 Mirrors `2_data_prep.ipynb` (`engineer_features` + `COLLINEAR_DROP_COLS`) verbatim,
-kept standalone so the Streamlit app has zero notebook dependency. `build_row`
+kept standalone so the app has zero notebook dependency. `build_row`
 turns ~10 advisor inputs + training defaults into a single row matching the
 champion's MLflow input signature (87 columns) exactly.
 """
