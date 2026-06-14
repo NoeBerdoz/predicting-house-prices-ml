@@ -1,0 +1,14 @@
+artifact_uri: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234/4d3c16fe92254923b4542230a7455691/artifacts
+end_time: 1781436656989
+entry_point_name: ''
+experiment_id: '139028628202202234'
+lifecycle_stage: active
+run_id: 4d3c16fe92254923b4542230a7455691
+run_name: MLPRegressor
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781436656953
+status: 3
+tags: []
+user_id: bogomil

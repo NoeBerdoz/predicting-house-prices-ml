@@ -1,0 +1,14 @@
+artifact_uri: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234/fdb1d8f76ee240c4b8fd28e3f0a2e30f/artifacts
+end_time: 1781436657178
+entry_point_name: ''
+experiment_id: '139028628202202234'
+lifecycle_stage: active
+run_id: fdb1d8f76ee240c4b8fd28e3f0a2e30f
+run_name: AdaBoost
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781436657141
+status: 3
+tags: []
+user_id: bogomil

@@ -1,0 +1,1 @@
+{"hidden_layer_sizes": [137, 80, 153], "activation": "tanh", "solver": "adam"}
