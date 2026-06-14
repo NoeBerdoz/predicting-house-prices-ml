@@ -4,7 +4,7 @@
     "model": "OLS_Baseline_5Feats",
     "cv_rmsle": 0.1514107479164845,
     "holdout_rmsle": 0.16428407856559404,
-    "fit_time_s": 0.002165555953979492,
+    "fit_time_s": 0.0022363662719726562,
     "params": null,
     "notes": null
   },
@@ -13,7 +13,7 @@
     "model": "OLS",
     "cv_rmsle": 0.121469542073977,
     "holdout_rmsle": 0.11699855537575084,
-    "fit_time_s": 0.033164024353027344,
+    "fit_time_s": 0.032906293869018555,
     "params": null,
     "notes": null
   },
@@ -22,7 +22,7 @@
     "model": "Ridge",
     "cv_rmsle": 0.11915449890882035,
     "holdout_rmsle": 0.12371634052899172,
-    "fit_time_s": 0.25401997566223145,
+    "fit_time_s": 0.3248744010925293,
     "params": {
       "alpha": 61.584821106602604
     },
@@ -33,7 +33,7 @@
     "model": "Lasso",
     "cv_rmsle": 0.11999671946633199,
     "holdout_rmsle": 0.11645119932601036,
-    "fit_time_s": 0.08504080772399902,
+    "fit_time_s": 0.13771414756774902,
     "params": {
       "alpha": 0.00042813323987193956,
       "n_zero_coefs": 47,
@@ -46,7 +46,7 @@
     "model": "ElasticNet",
     "cv_rmsle": 0.11957770705360345,
     "holdout_rmsle": 0.11891045494391364,
-    "fit_time_s": 0.21796178817749023,
+    "fit_time_s": 0.698244571685791,
     "params": {
       "alpha": 0.00379269019073225,
       "l1_ratio": 0.1
@@ -58,7 +58,7 @@
     "model": "KNN",
     "cv_rmsle": 0.17357261243017666,
     "holdout_rmsle": 0.18499380147818476,
-    "fit_time_s": 6.565686941146851,
+    "fit_time_s": 6.143002986907959,
     "params": {
       "k": 13
     },
@@ -69,7 +69,7 @@
     "model": "MLPRegressor",
     "cv_rmsle": 0.12524520236403414,
     "holdout_rmsle": 0.12509236537038074,
-    "fit_time_s": 135.46987915039062,
+    "fit_time_s": 127.85563111305237,
     "params": {
       "hidden_layer_sizes": [
         137,
@@ -86,7 +86,7 @@
     "model": "SVR",
     "cv_rmsle": 0.11775003041588697,
     "holdout_rmsle": 0.11588504110322531,
-    "fit_time_s": 4.784875869750977,
+    "fit_time_s": 3.621835947036743,
     "params": {
       "kernel": "rbf",
       "C": 10,

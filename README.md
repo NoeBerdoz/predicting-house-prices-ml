@@ -95,7 +95,15 @@ Le monitoring **3 couches** (= les 3 axes d'évaluation de la Phase 5, projetés
 
 ### Lancer le PoC
 
-Depuis la racine du dépôt, avec le `.venv` du projet activé :
+> **Prérequis — à faire une seule fois.** L'app sert le **champion enregistré dans MLflow** (dossier `mlruns/`). Ce dossier n'est **pas versionné** (le file-store MLflow encode des chemins absolus locaux, non portables d'une machine à l'autre) : il faut donc le **générer localement** en exécutant le notebook `5_deployment.ipynb`. Depuis la racine du dépôt, `.venv` activé :
+> ```bash
+> jupyter nbconvert --to notebook --execute 5_deployment.ipynb
+> # (optionnel) pour peupler aussi le registre des 17 modèles affiché sur la page Supervision :
+> #   jupyter nbconvert --to notebook --execute 5_deployment.ipynb 6_monitoring.ipynb
+> ```
+> `5_deployment.ipynb` ré-entraîne le champion sur 100 % des données et l'enregistre sous l'alias `inved-house-price@Production` (quelques minutes). **Sans cette étape, l'app s'arrête au démarrage** (`MlflowException: Registered Model ... not found`). *(Si vous exécutez déjà tous les notebooks dans l'ordre, `mlruns/` est créé automatiquement et rien de plus n'est requis.)*
+
+Ensuite, depuis la racine du dépôt, avec le `.venv` du projet activé :
 
 ```bash
 python app/app.py            # -> http://localhost:8502
@@ -107,7 +115,7 @@ Le modèle est chargé via MLflow ; deux chemins d'inférence (détection automa
    ```bash
    mlflow models serve --model-uri "models:/inved-house-price@Production" -p 5000 --env-manager local
    ```
-2. **En mémoire** (repli automatique) — sinon, le champion est chargé en process (aucune action requise).
+2. **En mémoire** (repli automatique) — sinon, le champion est chargé en process depuis `mlruns/` (généré au prérequis ci-dessus).
 
 > Détails techniques : `app/features.py` (`build_row` — format à 87 colonnes), `app/api_client.py` (clients d'inférence REST + en mémoire), générateurs `app/_generate_defaults.py` et `app/_gen_monitoring.py`. SHAP approximé via le membre XGBoost du Stacking (additivité vérifiée). Démo locale, sans authentification.
 
@@ -115,7 +123,7 @@ Le modèle est chargé via MLflow ; deux chemins d'inférence (détection automa
 
 ## Installation de l'environnement
 
-Python **3.13** requis (versions pinnées dans `requirements.txt`).
+Python **3.13** requis (versions pinnées dans `requirements.txt`). S'il n'est pas déjà installé : `brew install python@3.13` (macOS) ou via [python.org/downloads](https://www.python.org/downloads/) (Windows / Linux). Vérifier avec `python3.13 --version`.
 
 ```bash
 # 1. Virtual env (depuis la racine du repo)
