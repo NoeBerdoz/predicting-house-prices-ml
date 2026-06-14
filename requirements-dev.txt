@@ -1,0 +1,5 @@
+# Tooling required to run notebooks + verification scripts (not part of the model pipeline)
+ipykernel==6.31.0
+jupyter==1.1.1
+nbclient==0.10.2
+nbformat==5.10.4

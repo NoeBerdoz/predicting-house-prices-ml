@@ -4,7 +4,7 @@
     "model": "XGBoost_native",
     "cv_rmsle": 0.12555596580802222,
     "holdout_rmsle": 0.12103211539456568,
-    "fit_time_s": 1.7726078033447266,
+    "fit_time_s": 0.6853623390197754,
     "params": {
       "n_estimators": 500,
       "learning_rate": 0.05,
@@ -18,7 +18,7 @@
     "model": "XGBoost_onehot",
     "cv_rmsle": 0.1237168101810788,
     "holdout_rmsle": 0.11779556791508183,
-    "fit_time_s": 1.4906339645385742,
+    "fit_time_s": 0.5683403015136719,
     "params": {
       "n_estimators": 500,
       "learning_rate": 0.05,
@@ -32,7 +32,7 @@
     "model": "XGBoost_tuned",
     "cv_rmsle": 0.11711004067918904,
     "holdout_rmsle": 0.11928574014457732,
-    "fit_time_s": 1.0329604148864746,
+    "fit_time_s": 0.4632415771484375,
     "params": {
       "n_estimators": 437,
       "learning_rate": 0.023662268168248044,
@@ -43,14 +43,14 @@
       "reg_alpha": 0.0019384197835461844,
       "reg_lambda": 0.000125191594999711
     },
-    "notes": "Optuna 30 trials over 49s"
+    "notes": "Optuna 30 trials over 37s"
   },
   {
     "family": "native_boosting",
     "model": "LightGBM",
     "cv_rmsle": 0.12740929631915804,
     "holdout_rmsle": 0.13081137080785382,
-    "fit_time_s": 4.520752906799316,
+    "fit_time_s": 3.057105541229248,
     "params": {
       "n_estimators": 500,
       "learning_rate": 0.05,
@@ -63,7 +63,7 @@
     "model": "CatBoost",
     "cv_rmsle": 0.12228009285870764,
     "holdout_rmsle": 0.11748523573456003,
-    "fit_time_s": 7.778354167938232,
+    "fit_time_s": 5.704164743423462,
     "params": {
       "iterations": 500,
       "learning_rate": 0.05,
