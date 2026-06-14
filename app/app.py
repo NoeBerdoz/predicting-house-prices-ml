@@ -278,28 +278,40 @@ FEATURE_FR = {
 
 
 def _xgb_parts():
-    """XGBoost base of the Stacking champion (preprocessor, model) for SHAP — loaded once."""
+    """XGBoost base of the Stacking champion for SHAP — loaded once.
+
+    The served model is Pipeline([feature_engineering, model=Stacking]) (raw-row ingest,
+    NB5 §6.1): unwrap the FE step (raw -> engineered) and the XGBoost base's own
+    native preprocessor + booster.
+    """
     obj = getattr(CLIENT, "model", None)
     if obj is None:
         import mlflow as _m
         _m.set_tracking_uri(f"file:{ROOT / 'mlruns'}")
         obj = _m.sklearn.load_model("models:/inved-house-price@Production")
     try:
-        p = obj.named_estimators_["xgb"]
-        return p[:-1], p[-1]
+        fe = obj.named_steps["feature_engineering"]   # raw row -> engineered frame
+        stack = obj.named_steps["model"]              # StackingRegressor
+        p = stack.named_estimators_["xgb"]            # Pipeline[native_prep, XGBRegressor]
+        return fe, p[:-1], p[-1]
     except Exception:
-        return None, None
+        return None, None, None
 
 
-SHAP_PREP, SHAP_MODEL = _xgb_parts()
+FE_STEP, SHAP_PREP, SHAP_MODEL = _xgb_parts()
 
 
 def shap_top_factors(row, k=6):
-    """Per-estimate factors via XGBoost-native SHAP (pred_contribs). Returns [(label, %effect)]."""
+    """Per-estimate factors via XGBoost-native SHAP (pred_contribs). Returns [(label, %effect)].
+
+    `row` is a RAW row (build_row); apply the pipeline's FE step before the XGBoost
+    base's native preprocessor so feature names align with the trained booster.
+    """
     if SHAP_MODEL is None:
         return []
     import xgboost
-    Xt = SHAP_PREP.transform(row)
+    eng = FE_STEP.transform(row) if FE_STEP is not None else row
+    Xt = SHAP_PREP.transform(eng)
     cols = list(Xt.columns) if hasattr(Xt, "columns") else list(SHAP_PREP.get_feature_names_out())
     contribs = SHAP_MODEL.get_booster().predict(
         xgboost.DMatrix(Xt, enable_categorical=True), pred_contribs=True)[0][:-1]

@@ -47,8 +47,6 @@ Convention de numérotation : **`§N = numéro de phase`**. Le préfixe de fichi
 | `7_conclusion.ipynb` | —        | Synthèse exécutive (rapport à la direction) : récap CRISP-ML(Q), champion, risques, perspectives |
 
 > **Ordre d'exécution.** `2_data_prep.ipynb` est la **source unique** de la préparation : chaque notebook de modélisation/évaluation/monitoring le ré-exécute via `%run 2_data_prep.ipynb` en première cellule (rien à lancer à la main, mais il doit rester exécutable). `4_evaluation` lit les `results/family_*.json` produits par `3a`–`3d` ; `5_deployment` lit `results/winning_model.json` produit par `4_evaluation`.
->
-> *Archives (TODO: à supprimmer) : `old_2_Design_phase.ipynb`, `old_3_Assessment_Blueprint.ipynb` (originaux pré-découpage) et `predicting-houses-prices-ml.ipynb` (mono-notebook historique).*
 
 ---
 
@@ -59,6 +57,8 @@ Convention de numérotation : **`§N = numéro de phase`**. Le préfixe de fichi
 - **Critère de déploiement** : RMSLE ≤ **0,13** (franchi confortablement).
 - **MLflow** : le champion est enregistré dans le Model Registry sous l'alias **`inved-house-price@Production`** ; l'expérience contient le champion + les 17 modèles candidats.
   ```bash
+  # mlruns/ n'est pas versionné (chemins absolus locaux non portables)
+  jupyter nbconvert --to notebook --execute 5_deployment.ipynb 6_monitoring.ipynb
   mlflow ui --backend-store-uri file:./mlruns -p 5001     # explorer runs + registre
   ```
 

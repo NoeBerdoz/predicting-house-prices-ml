@@ -1,9 +1,11 @@
 """Feature engineering for the Inved PoC.
 
-Mirrors `2_data_prep.ipynb` (`engineer_features` + `COLLINEAR_DROP_COLS`) verbatim,
-kept standalone so the app has zero notebook dependency. `build_row`
-turns ~10 advisor inputs + training defaults into a single row matching the
-champion's MLflow input signature (87 columns) exactly.
+Mirrors `2_data_prep.ipynb` (`engineer_features`) verbatim, kept standalone so the
+app has zero notebook dependency. Since the champion pipeline now folds feature
+engineering in (RawFeatureEngineer, NB5 §6.1), the served signature is the RAW
+schema: `build_row` emits a single RAW row (79 original columns) — no manual
+engineering on the client side. `engineer_features` is kept for the monitoring
+charts (which still derive features locally), not for inference.
 """
 from __future__ import annotations
 
@@ -11,11 +13,6 @@ import json
 from pathlib import Path
 
 import pandas as pd
-
-# Collinear twins dropped from X_train in the notebooks. The champion's signature
-# still lists them (it was fit on X, which keeps them), so build_row must emit them;
-# the fitted ColumnTransformer ignores them at predict time.
-COLLINEAR_DROP_COLS = ["GarageArea", "TotalBsmtSF", "TotRmsAbvGrd", "GarageYrBlt"]
 
 _DEFAULTS_PATH = Path(__file__).resolve().parent / "defaults.json"
 
@@ -56,13 +53,18 @@ def load_defaults() -> dict:
 
 
 def build_row(form_values: dict, defaults: dict | None = None) -> pd.DataFrame:
-    """Advisor form values + training defaults -> 1-row DataFrame in champion-signature order."""
+    """Advisor form values + training defaults -> 1-row RAW DataFrame in signature order.
+
+    The champion pipeline folds feature engineering in (RawFeatureEngineer), so the
+    served signature is the RAW schema: this emits the original columns only, with no
+    client-side engineering (the model does it). See NB5 §6.1 (task T43).
+    """
     d = defaults if defaults is not None else load_defaults()
 
     raw = dict(d["raw_defaults"])  # full raw feature row (medians / modes)
     raw.update({k: v for k, v in form_values.items() if v is not None})
 
-    row = engineer_features(pd.DataFrame([raw]))
+    row = pd.DataFrame([raw])
 
     # Guarantee every signature column is present, in the exact training order.
     for col in d["signature_columns"]:
