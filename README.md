@@ -47,8 +47,6 @@ Convention de numérotation : **`§N = numéro de phase`**. Le préfixe de fichi
 | `7_conclusion.ipynb` | —        | Synthèse exécutive (rapport à la direction) : récap CRISP-ML(Q), champion, risques, perspectives |
 
 > **Ordre d'exécution.** `2_data_prep.ipynb` est la **source unique** de la préparation : chaque notebook de modélisation/évaluation/monitoring le ré-exécute via `%run 2_data_prep.ipynb` en première cellule (rien à lancer à la main, mais il doit rester exécutable). `4_evaluation` lit les `results/family_*.json` produits par `3a`–`3d` ; `5_deployment` lit `results/winning_model.json` produit par `4_evaluation`.
->
-> *Archives (TODO: à supprimmer) : `old_2_Design_phase.ipynb`, `old_3_Assessment_Blueprint.ipynb` (originaux pré-découpage) et `predicting-houses-prices-ml.ipynb` (mono-notebook historique).*
 
 ---
 
