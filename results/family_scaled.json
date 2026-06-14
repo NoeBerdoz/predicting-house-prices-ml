@@ -1,19 +1,28 @@
 [
   {
     "family": "scaled",
+    "model": "OLS_Baseline_5Feats",
+    "cv_rmsle": 0.15141074791648454,
+    "holdout_rmsle": 0.164284078565594,
+    "fit_time_s": 0.0033817291259765625,
+    "params": null,
+    "notes": null
+  },
+  {
+    "family": "scaled",
     "model": "OLS",
-    "cv_rmsle": 0.121469542073977,
-    "holdout_rmsle": 0.11699855537575084,
-    "fit_time_s": 0.032703399658203125,
+    "cv_rmsle": 0.12146954207397698,
+    "holdout_rmsle": 0.11699855537575073,
+    "fit_time_s": 0.06725311279296875,
     "params": null,
     "notes": null
   },
   {
     "family": "scaled",
     "model": "Ridge",
-    "cv_rmsle": 0.11915449890882035,
-    "holdout_rmsle": 0.12371634052899172,
-    "fit_time_s": 0.19010639190673828,
+    "cv_rmsle": 0.11915449890882038,
+    "holdout_rmsle": 0.12371634052899168,
+    "fit_time_s": 0.3371572494506836,
     "params": {
       "alpha": 61.584821106602604
     },
@@ -22,9 +31,9 @@
   {
     "family": "scaled",
     "model": "Lasso",
-    "cv_rmsle": 0.11999671946633199,
-    "holdout_rmsle": 0.11645119932601036,
-    "fit_time_s": 0.1045379638671875,
+    "cv_rmsle": 0.11999671946633206,
+    "holdout_rmsle": 0.11645119932601039,
+    "fit_time_s": 0.10567951202392578,
     "params": {
       "alpha": 0.00042813323987193956,
       "n_zero_coefs": 47,
@@ -35,9 +44,9 @@
   {
     "family": "scaled",
     "model": "ElasticNet",
-    "cv_rmsle": 0.11957770705360345,
-    "holdout_rmsle": 0.11891045494391364,
-    "fit_time_s": 0.38863205909729004,
+    "cv_rmsle": 0.11957770705360349,
+    "holdout_rmsle": 0.1189104549439136,
+    "fit_time_s": 0.4083411693572998,
     "params": {
       "alpha": 0.00379269019073225,
       "l1_ratio": 0.1
@@ -47,9 +56,9 @@
   {
     "family": "scaled",
     "model": "KNN",
-    "cv_rmsle": 0.17357261243017666,
+    "cv_rmsle": 0.17357261243017663,
     "holdout_rmsle": 0.18499380147818476,
-    "fit_time_s": 5.853424072265625,
+    "fit_time_s": 10.89893102645874,
     "params": {
       "k": 13
     },
@@ -58,9 +67,9 @@
   {
     "family": "scaled",
     "model": "MLPRegressor",
-    "cv_rmsle": 0.12524520236403414,
-    "holdout_rmsle": 0.12509236537038074,
-    "fit_time_s": 117.53403759002686,
+    "cv_rmsle": 0.1252452023640342,
+    "holdout_rmsle": 0.12509236537038076,
+    "fit_time_s": 100.49869871139526,
     "params": {
       "hidden_layer_sizes": [
         137,
@@ -75,9 +84,9 @@
   {
     "family": "scaled",
     "model": "SVR",
-    "cv_rmsle": 0.11775003041588697,
-    "holdout_rmsle": 0.11588504110322531,
-    "fit_time_s": 3.2729434967041016,
+    "cv_rmsle": 0.11775003041589169,
+    "holdout_rmsle": 0.11588504110322585,
+    "fit_time_s": 6.609176874160767,
     "params": {
       "kernel": "rbf",
       "C": 10,
