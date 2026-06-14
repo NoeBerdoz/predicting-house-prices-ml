@@ -1,0 +1,14 @@
+artifact_uri: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234/522ef2a8e5d241e9bc4893ce27d7a79b/artifacts
+end_time: 1781436657104
+entry_point_name: ''
+experiment_id: '139028628202202234'
+lifecycle_stage: active
+run_id: 522ef2a8e5d241e9bc4893ce27d7a79b
+run_name: RandomForest
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781436657068
+status: 3
+tags: []
+user_id: bogomil

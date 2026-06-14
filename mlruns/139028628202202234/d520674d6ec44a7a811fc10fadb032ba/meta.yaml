@@ -1,0 +1,14 @@
+artifact_uri: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234/d520674d6ec44a7a811fc10fadb032ba/artifacts
+end_time: 1781436656916
+entry_point_name: ''
+experiment_id: '139028628202202234'
+lifecycle_stage: active
+run_id: d520674d6ec44a7a811fc10fadb032ba
+run_name: ElasticNet
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781436656879
+status: 3
+tags: []
+user_id: bogomil

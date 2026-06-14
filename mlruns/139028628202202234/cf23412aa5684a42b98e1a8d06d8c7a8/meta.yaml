@@ -1,0 +1,14 @@
+artifact_uri: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234/cf23412aa5684a42b98e1a8d06d8c7a8/artifacts
+end_time: 1781436657067
+entry_point_name: ''
+experiment_id: '139028628202202234'
+lifecycle_stage: active
+run_id: cf23412aa5684a42b98e1a8d06d8c7a8
+run_name: DecisionTree
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781436657031
+status: 3
+tags: []
+user_id: bogomil

@@ -1,0 +1,14 @@
+artifact_uri: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234/aca86fb4df0c4d98a90f3286319d011c/artifacts
+end_time: 1781436657370
+entry_point_name: ''
+experiment_id: '139028628202202234'
+lifecycle_stage: active
+run_id: aca86fb4df0c4d98a90f3286319d011c
+run_name: CatBoost
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1781436657334
+status: 3
+tags: []
+user_id: bogomil
