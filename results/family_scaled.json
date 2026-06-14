@@ -4,7 +4,7 @@
     "model": "OLS",
     "cv_rmsle": 0.121469542073977,
     "holdout_rmsle": 0.11699855537575084,
-    "fit_time_s": 0.3265078067779541,
+    "fit_time_s": 0.032703399658203125,
     "params": null,
     "notes": null
   },
@@ -13,7 +13,7 @@
     "model": "Ridge",
     "cv_rmsle": 0.11915449890882035,
     "holdout_rmsle": 0.12371634052899172,
-    "fit_time_s": 1.7569606304168701,
+    "fit_time_s": 0.19010639190673828,
     "params": {
       "alpha": 61.584821106602604
     },
@@ -24,7 +24,7 @@
     "model": "Lasso",
     "cv_rmsle": 0.11999671946633199,
     "holdout_rmsle": 0.11645119932601036,
-    "fit_time_s": 0.18670320510864258,
+    "fit_time_s": 0.1045379638671875,
     "params": {
       "alpha": 0.00042813323987193956,
       "n_zero_coefs": 47,
@@ -37,7 +37,7 @@
     "model": "ElasticNet",
     "cv_rmsle": 0.11957770705360345,
     "holdout_rmsle": 0.11891045494391364,
-    "fit_time_s": 0.6708745956420898,
+    "fit_time_s": 0.38863205909729004,
     "params": {
       "alpha": 0.00379269019073225,
       "l1_ratio": 0.1
@@ -49,7 +49,7 @@
     "model": "KNN",
     "cv_rmsle": 0.17357261243017666,
     "holdout_rmsle": 0.18499380147818476,
-    "fit_time_s": 8.272046566009521,
+    "fit_time_s": 5.853424072265625,
     "params": {
       "k": 13
     },
@@ -58,14 +58,16 @@
   {
     "family": "scaled",
     "model": "MLPRegressor",
-    "cv_rmsle": 0.3391959954666958,
-    "holdout_rmsle": 0.26456788821052296,
-    "fit_time_s": 1.968104362487793,
+    "cv_rmsle": 0.12524520236403414,
+    "holdout_rmsle": 0.12509236537038074,
+    "fit_time_s": 117.53403759002686,
     "params": {
       "hidden_layer_sizes": [
-        64
+        137,
+        80,
+        153
       ],
-      "activation": "relu",
+      "activation": "tanh",
       "solver": "adam"
     },
     "notes": null
@@ -75,7 +77,7 @@
     "model": "SVR",
     "cv_rmsle": 0.11775003041588697,
     "holdout_rmsle": 0.11588504110322531,
-    "fit_time_s": 4.5968098640441895,
+    "fit_time_s": 3.2729434967041016,
     "params": {
       "kernel": "rbf",
       "C": 10,
