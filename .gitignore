@@ -1,0 +1,61 @@
+# --- Claude Code working artifacts (private, never committed) ---
+.claude/
+CLAUDE.md
+.claude.json
+.aider*
+.cursor/
+.idea/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# --- MLflow / experiment tracking ---
+# mlruns/ is NOT committed (reversed the T34 "commit it" decision, 2026-06-14): the file store
+# bakes in absolute local paths (artifact_uri = file:///home/<user>/.../mlruns/...) and user_id,
+# so it is not portable — off-machine the UI lists runs/metrics but artifacts & registry
+# model-load 404. Regenerate locally (deterministic) with:
+#   jupyter nbconvert --to notebook --execute 5_deployment.ipynb 6_monitoring.ipynb
+#   mlflow ui --backend-store-uri file:./mlruns
+mlruns/
+mlartifacts/
+mlflow.db
+
+# CatBoost training-log dir, auto-written to cwd on every .fit() — pure churn, no code reads it.
+catboost_info/
+
+# --- Models & generated artifacts ---
+*.pkl
+*.joblib
+models/
+artifacts/
+
+# --- Local outputs / submissions ---
+submission*.csv
+!data/sample_submission.csv
+outputs/
+figures/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

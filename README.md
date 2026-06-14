@@ -59,6 +59,8 @@ Convention de numérotation : **`§N = numéro de phase`**. Le préfixe de fichi
 - **Critère de déploiement** : RMSLE ≤ **0,13** (franchi confortablement).
 - **MLflow** : le champion est enregistré dans le Model Registry sous l'alias **`inved-house-price@Production`** ; l'expérience contient le champion + les 17 modèles candidats.
   ```bash
+  # mlruns/ n'est pas versionné (chemins absolus locaux non portables)
+  jupyter nbconvert --to notebook --execute 5_deployment.ipynb 6_monitoring.ipynb
   mlflow ui --backend-store-uri file:./mlruns -p 5001     # explorer runs + registre
   ```
 

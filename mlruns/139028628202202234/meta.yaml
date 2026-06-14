@@ -1,8 +1,0 @@
-artifact_location: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/139028628202202234
-creation_time: 1781436644770
-experiment_id: '139028628202202234'
-last_update_time: 1781436644770
-lifecycle_stage: active
-name: inved-house-price
-trace_location: null
-workspace: default

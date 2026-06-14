@@ -1,8 +1,0 @@
-artifact_location: file:///home/bogomil/Documents/GitHub/predicting-house-prices-ml/mlruns/0
-creation_time: 1781436644765
-experiment_id: '0'
-last_update_time: 1781436644765
-lifecycle_stage: active
-name: Default
-trace_location: null
-workspace: default
